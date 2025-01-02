@@ -1,28 +1,15 @@
 <?php
-require './vendor/autoload.php';
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
+header('Content-Type: application/json');
+$requestUri = $_SERVER['REQUEST_URI'];
 
-$sec_key = '12345test';
-$payload = array(
-    'isd' => 'localhost',
-    'aud' => 'localhost',
-    'username' => 'test',
-    'password' => 'test',
-);
-
-$encode = JWT::encode($payload, $sec_key, 'HS256');
-// echo $encode;
-
-
-$headers = apache_request_headers();
-// print_r($headers);
-if ($headers['Authorization']) {
-    $headerAuth = $headers['Authorization'];
-    $decode = JWT::decode($headerAuth, new Key($sec_key, 'HS256'));
-    print_r($decode);
+if (strpos($requestUri, '/api/login') === 0) {
+    require './api/login.php';
+} elseif (strpos($requestUri, '/api/register') === 0) {
+    require './api/register.php';
+} elseif (strpos($requestUri, '/api/protected') === 0) {
+    require './api/protected.php';
+} elseif (strpos($requestUri, '/api/refresh') === 0) {
+    require './api/refresh.php';
+} else {
+    echo json_encode(['message' => 'API not found']);
 }
-
-
-
-
