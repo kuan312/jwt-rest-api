@@ -1,6 +1,6 @@
 # Firebase JWT REST API
 
-This is a demonstration of REST API built using Firebase JWT, featuring routes for user registration, login, token refresh, and access to protected resources.
+This is a demonstration of REST API built using Firebase JWT, featuring endpoints for user registration, login, token refresh, and access to protected resource.
 
 ## Installation
 ```bash
@@ -9,7 +9,7 @@ composer i
 
 ## Endpoints
 
-### **Register User**
+### 🌐**Register User**
 **POST** `/api/register`
 
 **Request Body:**
@@ -26,8 +26,9 @@ composer i
     "message": "User registered successfully"
 }
 ```
+<hr>
 
-### **Login**
+### 🌐**Login**
 **POST** `/api/login`
 
 **Request Body:**
@@ -45,8 +46,9 @@ composer i
     "refresh_token": "<refresh_token>"
 }
 ```
+<hr>
 
-### **Refresh Token**
+### 🌐**Refresh Token**
 **POST** `/api/refresh`
 
 **Request Body:**
@@ -63,7 +65,9 @@ composer i
 }
 ```
 
-### **Protected Route**
+<hr>
+
+### 🌐**Protected Route**
 **GET** `/api/protected`
 
 **Headers:**
