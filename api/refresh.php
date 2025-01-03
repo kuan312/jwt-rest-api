@@ -1,32 +1,21 @@
 <?php
-require '../vendor/autoload.php';
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 
-$sec_key = '12345test';
-$data = json_decode(file_get_contents('php://input'), true);
+require './functions.php';
+
+$data = getJsonInput();
 
 if (!isset($data['refresh_token'])) {
-    echo json_encode([
-        'type' => 'error',
-        'message' => 'Refresh token missing'
-    ]);
-    exit;
+    sendError('Refresh token missing');
 }
 
-$tokensFile = __DIR__ . '/../db/tokens_data.json';
-$tokens = file_exists($tokensFile) ? json_decode(file_get_contents($tokensFile), true) : [];
+$tokens = loadTokens();
 
 try {
-    $decoded = JWT::decode($data['refresh_token'], new Key($sec_key, 'HS256'));
+    $decoded = decodeJWT($data['refresh_token'], $sec_key);
     $username = $decoded->username;
 
     if (!isset($tokens[$username]) || $tokens[$username]['refresh'] !== $data['refresh_token']) {
-        echo json_encode([
-            'type' => 'error',
-            'message' => 'Invalid refresh token'
-        ]);
-        exit;
+        sendError('Invalid refresh token', 401);
     }
 
     $accessPayload = [
@@ -37,16 +26,12 @@ try {
         'username' => $username
     ];
 
-    $newAccessToken = JWT::encode($accessPayload, $sec_key, 'HS256');
+    $newAccessToken = generateJWT($accessPayload, $sec_key);
     $tokens[$username]['access'] = $newAccessToken;
+    saveTokens($tokens);
 
-    file_put_contents($tokensFile, json_encode($tokens));
-
-    echo json_encode(['access_token' => $newAccessToken]);
+    respondJson(['access_token' => $newAccessToken]);
 } catch (Exception $e) {
-    echo json_encode([
-        'type' => 'error',
-        'message' => 'Invalid or expired refresh token'
-    ]);
-    exit;
+    sendError('Invalid or expired refresh token', 401);
 }
+?>

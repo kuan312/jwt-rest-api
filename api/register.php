@@ -1,31 +1,21 @@
 <?php
-require '../vendor/autoload.php';
 
-$data = json_decode(file_get_contents('php://input'), true);
+require './functions.php';
+
+$data = getJsonInput();
 
 if (!isset($data['username'], $data['password'])) {
-    echo json_encode([
-        'type' => 'error',
-        'message' => 'Invalid input'
-    ]);
-    exit;
+    sendError('Invalid input');
 }
 
-$usersFile = __DIR__ . '/../db/credentials.json';
-$users = file_exists($usersFile) ? json_decode(file_get_contents($usersFile), true) : [];
+$users = loadUsers();
 
 if (isset($users[$data['username']])) {
-    echo json_encode([
-        'type' => 'error',
-        'message' => 'User already exists'
-    ]);
-    exit;
+    sendError('User already exists');
 }
 
 $users[$data['username']] = password_hash($data['password'], PASSWORD_DEFAULT);
-file_put_contents($usersFile, json_encode($users));
+saveUsers($users);
 
-echo json_encode([
-    'type' => 'success',
-    'message' => 'User registered successfully'
-]);
+sendSuccess(['message' => 'User registered successfully']);
+?>
